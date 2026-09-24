@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>导航</title>
+<script>
+  /* 尽早应用主题，避免刷新时闪白。默认暗色；仅本次会话内记住切换 */
+  (function () {
+    try {
+      var t = sessionStorage.getItem('nav_theme_v1');
+      document.documentElement.setAttribute('data-theme', t === 'light' ? 'light' : 'dark');
+    } catch (e) { document.documentElement.setAttribute('data-theme', 'dark'); }
+  })();
+</script>
+<style>
+  /* ============ 主题变量（默认暗色） ============ */
+  :root{
+    color-scheme: dark;
+    --bg:#1e1e1e; --surface:#2a2a2a; --surface-2:#252525; --line:#353535; --line-strong:#4a4a4a;
+    --text:#e8e8e8; --sub:#b4b4b4; --faint:#a6a6a6;
+    --brand:#c04848; --brand-h:#d05c58; --brand-soft:rgba(208,92,88,.14); --brand-line:rgba(208,92,88,.34);
+    --shadow:0 1px 2px rgba(0,0,0,.38), 0 6px 18px rgba(0,0,0,.26);
+    --shadow-hover:0 12px 30px rgba(0,0,0,.45);
+    --overlay:rgba(0,0,0,.62);
+    --toast-bg:#3a3a3a; --toast-fg:#f2f2f2;
+    --toast-err-bg:#7f2222; --toast-err-fg:#ffe9e9;
+    --pad-x:20px; --gap:14px;
+  }
+  :root[data-theme="light"]{
+    color-scheme: light;
+    --bg:#f6f6f7; --surface:#ffffff; --surface-2:#f2f2f4; --line:#e4e4e7; --line-strong:#cfcfd6;
+    --text:#1b1b1d; --sub:#66666e; --faint:#6e6e76;
+    --brand:#c04848; --brand-h:#a83c3c; --brand-soft:rgba(192,72,72,.10); --brand-line:rgba(192,72,72,.30);
+    --shadow:0 1px 2px rgba(24,24,28,.05), 0 6px 18px rgba(24,24,28,.07);
+    --shadow-hover:0 10px 28px rgba(24,24,28,.14);
+    --overlay:rgba(20,20,24,.45);
+    --toast-bg:#232326; --toast-fg:#f2f2f4;
+    --toast-err-bg:#8f2020; --toast-err-fg:#ffeded;
+  }
+
+  /* ============ 基础 ============ */
+  [hidden]{display:none!important}
+  *{box-sizing:border-box}
+  body{
+    margin:0;min-height:100vh;color:var(--text);background:var(--bg);
+    font:16px/1.5 system-ui,-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    display:flex;flex-direction:column;
+    transition:background-color .25s, color .25s;
+  }
+  :root[data-theme="dark"] body{
+    background: var(--bg);
+  }
+  :root[data-theme="dark"] ::-webkit-scrollbar{width:10px;height:10px}
+  :root[data-theme="dark"] ::-webkit-scrollbar-thumb{background:#3f3f3f;border-radius:8px}
+  :root[data-theme="dark"] ::-webkit-scrollbar-thumb:hover{background:#4d4d4d}
+  :root[data-theme="dark"] ::-webkit-scrollbar-track{background:transparent}
+
+  /* 环境光：左上与右下两团暖光，大半径径向渐变 + 多段缓落，避免台阶 */
+  body::before{
+    content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  }
+  :root[data-theme="dark"] body::before{
+    background:
+      radial-gradient(1350px 900px at -3% -5%,
+        rgba(208,92,88,.11), rgba(208,92,88,.055) 35%, rgba(208,92,88,.016) 62%, rgba(208,92,88,0) 86%),
+      radial-gradient(1350px 900px at 103% 105%,
+        rgba(208,92,88,.09), rgba(208,92,88,.045) 35%, rgba(208,92,88,.013) 62%, rgba(208,92,88,0) 86%),
+      radial-gradient(800px 460px at 100% 0%,
+        rgba(208,92,88,.03), rgba(208,92,88,0) 75%);
+  }
+  :root[data-theme="light"] body::before{
+    background:
+      radial-gradient(1350px 900px at -3% -5%,
+        rgba(192,72,72,.07), rgba(192,72,72,.032) 35%, rgba(192,72,72,.01) 62%, rgba(192,72,72,0) 86%),
+      radial-gradient(1350px 900px at 103% 105%,
+        rgba(192,72,72,.055), rgba(192,72,72,.026) 35%, rgba(192,72,72,.008) 62%, rgba(192,72,72,0) 86%),
+      radial-gradient(800px 460px at 100% 0%,
+        rgba(192,72,72,.02), rgba(192,72,72,0) 75%);
+  }
+
+  /* 细噪点（抖动）：打碎暗部渐变的量化色带，并带来细腻的胶片颗粒质感 */
+  body::after{
+    content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity:.022;
+  }
+  :root[data-theme="light"] body::after{ opacity:.015 }
+
+  /* 统一内容轴：页眉与正文同轴对齐 */
+  .wrap{width:100%;max-width:1280px;margin:0 auto;padding:0 var(--pad-x)}
+
+  /* ============ 顶栏 ============ */
+  header{
+    position:sticky;top:0;z-index:30;border-bottom:1px solid var(--line);
+    background:rgba(30,30,30,.86);backdrop-filter:saturate(180%) blur(12px);
+    transition:background-color .25s, border-color .25s;
+  }
+  :root[data-theme="light"] header{background:rgba(255,255,255,.86)}
+  .head-in{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding-top:12px;padding-bottom:12px}
+  .brand{display:flex;align-items:center;gap:10px;min-width:0}
+  h1{font-size:19px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #titleInput{
+    font:700 19px/1.4 inherit;border:1px solid var(--line);border-radius:9px;padding:4px 9px;
+    background:var(--surface-2);color:var(--text);min-width:200px;
+  }
+  #titleInput:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+  .right{display:flex;align-items:center;gap:9px;margin-left:auto}
+  .actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end}
+
+  /* ============ 按钮 ============ */
+  .btn{
+    font:inherit;font-size:14px;padding:7px 14px;min-height:36px;border-radius:999px;cursor:pointer;
+    display:inline-flex;align-items:center;justify-content:center;
+    border:1px solid var(--line);background:var(--surface);color:var(--text);
+    transition:border-color .15s, box-shadow .15s, background-color .15s, color .25s;white-space:nowrap;
+  }
+  .btn:hover{border-color:var(--line-strong);box-shadow:var(--shadow)}
+  .btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+  .btn.primary:hover{background:var(--brand-h);border-color:var(--brand-h)}
+  .btn:disabled{opacity:.55;cursor:not-allowed}
+  #btnTheme{width:36px;height:36px;min-height:36px;padding:0}
+  #btnTheme svg{display:block}
+  .ico-moon{display:none}
+  :root[data-theme="light"] .ico-sun{display:none}
+  :root[data-theme="light"] .ico-moon{display:block}
+  .chip{
+    font-size:13px;color:var(--brand);background:var(--brand-soft);border:1px solid var(--brand-line);
+    padding:5px 11px;border-radius:999px;
+  }
+
+  /* ============ 主区 ============ */
+  main{flex:1 1 auto;padding-top:22px;padding-bottom:40px}
+  /* 每行固定 4 个，四列等宽均匀分布；窄屏逐级降为 3/2/1 列 */
+  .grid{
+    display:grid;gap:var(--gap);
+    grid-template-columns:repeat(4, minmax(0, 1fr));
+  }
+  a.card{
+    display:block;background:var(--surface);border:1px solid var(--line);border-radius:14px;
+    padding:17px;text-decoration:none;color:inherit;box-shadow:var(--shadow);
+    transition:transform .15s, box-shadow .15s, border-color .15s, background-color .25s;
+  }
+  a.card:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover);border-color:var(--brand-line)}
+  .card .name{font-weight:600;font-size:18px;overflow-wrap:anywhere}
+  .card .desc{color:var(--sub);font-size:13px;margin-top:6px;overflow-wrap:anywhere}
+  .card .lock-hint{display:flex;align-items:center;gap:5px}
+  /* 锁定占位卡片：与普通链接卡片同款外观（边框/圆角/阴影），但保持静止，无悬停动效 */
+  .card.locked{
+    display:block;background:var(--surface);border:1px solid var(--line);border-radius:14px;
+    padding:17px;color:inherit;box-shadow:var(--shadow);cursor:pointer;
+  }
+  .card.edit{display:flex;flex-direction:column;gap:8px}
+  .in{
+    font:inherit;font-size:14px;width:100%;padding:8px 10px;border:1px solid var(--line);
+    border-radius:9px;background:var(--surface-2);color:var(--text);
+  }
+  .in:focus{outline:none;border-color:var(--brand);background:var(--surface);box-shadow:0 0 0 3px var(--brand-soft)}
+  .in::placeholder{color:var(--faint)}
+  .card.edit .row{display:flex;gap:8px}
+  .card.edit .row.end{justify-content:flex-end}
+  .iconbtn{
+    font:inherit;font-size:14px;height:32px;min-width:34px;padding:0 8px;border-radius:9px;
+    border:1px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer;
+    transition:border-color .15s, background-color .15s;
+  }
+  .iconbtn:hover{border-color:var(--line-strong)}
+  .iconbtn.del{color:var(--brand);border-color:var(--brand-line);padding:0 12px}
+  .iconbtn.del:hover{background:var(--brand-soft)}
+  .iconbtn.lockbtn{display:inline-flex;align-items:center;justify-content:center}
+  .iconbtn.lockbtn svg{display:block}
+  .iconbtn.lockbtn.on{color:var(--brand);border-color:var(--brand-line);background:var(--brand-soft)}
+  .empty{color:var(--sub);text-align:center;padding:40px 0}
+
+  /* ============ 页脚 ============ */
+  footer{border-top:1px solid var(--line);margin-top:8px}
+  .foot-in{padding-top:16px;padding-bottom:20px;color:var(--faint);font-size:12.5px;display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:space-between}
+
+  /* ============ 弹窗 / 提示 ============ */
+  .overlay{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:18px;background:var(--overlay)}
+  .dialog{
+    width:100%;max-width:540px;background:var(--surface);border:1px solid var(--line);
+    border-radius:16px;padding:22px;box-shadow:0 24px 60px rgba(0,0,0,.45);
+  }
+  .dialog h2{margin:0 0 14px;font-size:18px}
+  .dialog input[type=password]{
+    width:100%;font:inherit;font-size:14px;padding:10px 12px;border:1px solid var(--line);
+    border-radius:10px;background:var(--surface-2);color:var(--text);
+    text-align:left;                 /* 输入后：左对齐 */
+  }
+  /* 空值时：提示文字居中显示在输入框中间 */
+  .dialog input[type=password]:placeholder-shown{text-align:center}
+  .dialog input[type=password]::placeholder{color:var(--faint);opacity:1}
+  .dialog input[type=password]:focus{outline:none;border-color:var(--brand);background:var(--surface);box-shadow:0 0 0 3px var(--brand-soft)}
+  .check{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--sub);margin:12px 0 0}
+  .actions-end{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+  .err{color:var(--brand);font-size:13px;margin:10px 0 0}
+  .toast{
+    position:fixed;left:50%;bottom:26px;z-index:60;max-width:90vw;text-align:center;
+    transform:translate(-50%,20px);opacity:0;pointer-events:none;
+    background:var(--toast-bg);color:var(--toast-fg);padding:11px 16px;border-radius:10px;font-size:14px;
+    transition:opacity .25s, transform .25s;box-shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+  .toast.err{background:var(--toast-err-bg);color:var(--toast-err-fg)}
+
+  @media (max-width:1100px){
+    .grid{grid-template-columns:repeat(3, minmax(0, 1fr))}
+  }
+  @media (max-width:820px){
+    .grid{grid-template-columns:repeat(2, minmax(0, 1fr))}
+  }
+  @media (max-width:560px){
+    :root{--pad-x:16px}
+    h1{font-size:17px}
+    .btn{padding:7px 12px;font-size:13px}
+    #titleInput{min-width:150px;font-size:16px}
+    .grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap head-in">
+    <div class="brand"><span id="brandTitle"></span></div>
+    <div class="right">
+      <div class="actions" id="headerActions"></div>
+      <button class="btn" id="btnTheme" aria-label="切换明暗主题" title="切换明暗主题">
+        <svg class="ico-sun" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.7v2.1M12 19.2v2.1M2.7 12h2.1M19.2 12h2.1M5.5 5.5l1.5 1.5M17 17l1.5 1.5M18.5 5.5L17 7M7 17l-1.5 1.5"/></svg>
+        <svg class="ico-moon" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.4 14.7A8.5 8.5 0 0 1 9.3 3.6a8.5 8.5 0 1 0 11.1 11.1Z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="grid" id="grid"></div>
+    <p class="empty" id="empty" hidden>还没有任何链接。登录后点「＋ 添加链接」开始添加。</p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot-in">
+    <span id="footHint">未登录 · 只读浏览</span>
+    <span>由 GitHub Pages 托管</span>
+  </div>
+</footer>
+
+<div class="overlay" id="modal" hidden>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlgTitle">
+    <h2 id="dlgTitle">登录以编辑导航</h2>
+    <input id="tokenInput" type="password" placeholder="请输入管理员密钥" aria-label="管理员密钥" autocomplete="off" spellcheck="false">
+    <label class="check"><input type="checkbox" id="rememberChk"> 记住令牌（下次打开免登录，仅本机）</label>
+    <p class="err" id="loginErr" hidden></p>
+    <div class="actions-end">
+      <button class="btn" id="cancelLogin">取消</button>
+      <button class="btn primary" id="doLogin">登录</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   导航 · 单文件页面（默认暗色）
+   · 未登录：只展示链接卡片（所有人可见）
+   · 登录：粘贴 GitHub 令牌（PAT，需 repo 权限），即可增删改链接
+   · 保存：把数据写入本仓库根目录的 nav.json，GitHub 自动提交并发布
+   · 锁定链接：设为「登录后访问」后，未登录访客只看到占位卡片，
+     登录后才能点击跳转（注意：数据存于公开的 nav.json，仅为展示层隐藏）
+   部署位置：仓库根目录。页面若换位置，请同步修改 CONFIG
+   ============================================================ */
+
+const CONFIG = {
+  owner: 'Duila007',
+  repo: '-',
+  branch: 'main',
+  dataPath: 'nav.json'              // nav.json 在仓库中的路径
+};
+
+/* 默认数据（第一次打开、或 nav.json 还没生成时显示的内容） */
+const DEFAULT_NAV = {
+  title: '导航',
+  links: [
+    { name: '免费公益站统计合集', url: 'https://vcnzf1j2lbd8.feishu.cn/wiki/OY8fwp7C5ihpJ2kez8Mc2cKUncf', desc: '飞书文档 · 持续更新' },
+    { name: '我的飞书文档', url: 'https://vcnzf1j2lbd8.feishu.cn/docx/JiIed93OMoN8XKxPx1wcxG4nn7c', desc: '飞书文档' }
+  ]
+};
+
+const CACHE_KEY = 'nav_cache_v1';
+const TOKEN_KEY = 'nav_token_v1';
+const THEME_KEY = 'nav_theme_v1';
+
+let navData = null;       // { title, links:[{name,url,desc,lock}] }
+let editing = false;      // 是否处于编辑模式
+let saving = false;
+let currentUser = null;   // 已登录的 GitHub 账号
+let currentToken = null;
+
+/* ---------------- 小工具 ---------------- */
+const $ = (s, r) => (r || document).querySelector(s);
+
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => (
+    { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]
+  ));
+}
+function toast(msg, kind, ms){
+  const t = $('#toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (kind ? ' ' + kind : '');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => { t.className = 'toast'; }, ms || 3200);
+}
+function b64encodeUtf8(str){
+  const bytes = new TextEncoder().encode(str);
+  let bin = '';
+  for (const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin);
+}
+function normalizeUrl(u){
+  u = String(u || '').trim();
+  if (!u) return '';
+  if (!/^https?:\/\//i.test(u)) u = 'https://' + u.replace(/^\/+/, '');
+  return u;
+}
+function hostOf(u){
+  try { return new URL(u).hostname; } catch (e) { return ''; }
+}
+/* 锁定图标（与顶栏主题按钮同风格的描边 SVG） */
+function lockSvg(locked){
+  return locked
+    ? '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="9.5" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>'
+    : '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="9.5" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 7.9-.9"/></svg>';
+}
+
+/* ---------------- 主题（默认暗色，仅本次会话记住切换） ---------------- */
+function currentTheme(){
+  return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+}
+function updateThemeBtn(){
+  const b = $('#btnTheme');
+  if (!b) return;
+  const dark = currentTheme() === 'dark';
+  const label = dark ? '切换到亮色模式' : '切换到暗色模式';
+  b.title = label;
+  b.setAttribute('aria-label', label);
+}
+function setTheme(t, persist){
+  document.documentElement.setAttribute('data-theme', t === 'light' ? 'light' : 'dark');
+  if (persist !== false){ try { sessionStorage.setItem(THEME_KEY, t); } catch (e) {} }
+  updateThemeBtn();
+}
+
+/* ---------------- 数据 ---------------- */
+function normalizeData(d){
+  if (!d || typeof d !== 'object' || !Array.isArray(d.links)) return null;
+  const links = d.links
+    .filter(x => x && (x.url || x.name))
+    .map(x => ({
+      name: String((x && x.name) || ''),
+      url: normalizeUrl(x && x.url),
+      desc: String((x && x.desc) || ''),
+      lock: !!(x && x.lock)
+    }));
+  return { title: String(d.title || '导航'), links };
+}
+function cacheGet(){
+  try { const raw = localStorage.getItem(CACHE_KEY); return raw ? JSON.parse(raw) : null; }
+  catch (e) { return null; }
+}
+function cacheSet(d){
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify(d)); } catch (e) {}
+}
+async function loadPublished(){
+  try {
+    const res = await fetch('./nav.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!res.ok) return null;
+    return normalizeData(await res.json());
+  } catch (e) { return null; }
+}
+
+/* ---------------- GitHub API ---------------- */
+async function gh(path, opts){
+  opts = opts || {};
+  const res = await fetch('https://api.github.com' + path, {
+    method: opts.method || 'GET',
+    headers: Object.assign({
+      'Authorization': 'Bearer ' + currentToken,
+      'Accept': 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28'
+    }, opts.headers || {}),
+    body: opts.body
+  });
+  let data = null;
+  try { data = await res.json(); } catch (e) {}
+  return { ok: res.ok, status: res.status, data: data };
+}
+
+async function verifyToken(token){
+  currentToken = token;
+  const me = await gh('/user');
+  if (!me.ok){
+    currentToken = null;
+    return { ok: false, error: me.status === 401 ? '令牌无效或已过期' : ('GitHub 接口返回 HTTP ' + me.status) };
+  }
+  const perm = await gh('/repos/' + CONFIG.owner + '/' + CONFIG.repo);
+  if (!perm.ok){
+    currentToken = null;
+    return { ok: false, error: '无法读取仓库 ' + CONFIG.owner + '/' + CONFIG.repo + '（HTTP ' + perm.status + '）' };
+  }
+  const canPush = !!(perm.data && perm.data.permissions && perm.data.permissions.push);
+  if (!canPush){
+    currentToken = null;
+    return { ok: false, error: '账号 ' + me.data.login + ' 没有该仓库的编辑权限' };
+  }
+  return { ok: true, login: me.data.login };
+}
+
+async function doLogin(token, remember){
+  token = String(token || '').trim();
+  if (!token) return { ok: false, error: '请输入管理员密钥' };
+  const r = await verifyToken(token);
+  if (!r.ok) return r;
+  currentUser = r.login;
+  setStoredToken(token, remember);
+  editing = true;
+  render();
+  toast('已登录：' + currentUser + '，现在可以编辑');
+  return r;
+}
+
+/* ---------------- 登录态存取 ---------------- */
+function getStoredToken(){
+  return localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY) || '';
+}
+function setStoredToken(tk, remember){
+  if (remember){ localStorage.setItem(TOKEN_KEY, tk); sessionStorage.removeItem(TOKEN_KEY); }
+  else { sessionStorage.setItem(TOKEN_KEY, tk); localStorage.removeItem(TOKEN_KEY); }
+}
+function clearStoredToken(){
+  localStorage.removeItem(TOKEN_KEY);
+  sessionStorage.removeItem(TOKEN_KEY);
+}
+async function restoreSession(){
+  const tk = getStoredToken();
+  if (!tk) return;
+  const r = await verifyToken(tk);
+  if (r.ok){
+    currentUser = r.login;
+    render();
+  } else {
+    clearStoredToken();
+    currentToken = null;
+    render();
+  }
+}
+function logout(){
+  clearStoredToken();
+  currentToken = null; currentUser = null; editing = false;
+  render();
+  toast('已退出登录');
+}
+
+/* ---------------- 渲染 ---------------- */
+function cardViewHTML(l){
+  if (l.lock && !currentUser){
+    return '<div class="card locked" title="登录后可访问">' +
+        '<div class="name">' + esc(l.name || '加密链接') + '</div>' +
+        (l.desc ? '<div class="desc">' + esc(l.desc) + '</div>' : '') +
+        '<div class="desc lock-hint">' + lockSvg(true) + '<span>登录后访问</span></div>' +
+      '</div>';
+  }
+  return '<a class="card" href="' + esc(l.url) + '" target="_blank" rel="noopener">' +
+      '<div class="name">' + esc(l.name || l.url) + '</div>' +
+      (l.desc ? '<div class="desc">' + esc(l.desc) + '</div>' : '') +
+    '</a>';
+}
+function cardEditHTML(l, i){
+  return '<div class="card edit" data-idx="' + i + '">' +
+      '<input class="in in-name" value="' + esc(l.name) + '" placeholder="名称">' +
+      '<input class="in in-url" value="' + esc(l.url) + '" placeholder="https://链接地址" spellcheck="false">' +
+      '<input class="in in-desc" value="' + esc(l.desc) + '" placeholder="备注（可选）">' +
+      '<div class="row end">' +
+        '<button class="iconbtn lockbtn' + (l.lock ? ' on' : '') + '" data-act="lock" title="' + (l.lock ? '登录后才能访问（点击改为公开）' : '所有人可见（点击设为登录后访问）') + '">' + lockSvg(!!l.lock) + '</button>' +
+        '<button class="iconbtn" data-act="up" title="上移">↑</button>' +
+        '<button class="iconbtn" data-act="down" title="下移">↓</button>' +
+        '<button class="iconbtn del" data-act="del">删除</button>' +
+      '</div>' +
+    '</div>';
+}
+function render(){
+  document.title = navData.title || '导航';
+
+  const act = $('#headerActions');
+  if (!currentUser){
+    act.innerHTML = '<button class="btn primary" id="btnLogin">登录</button>';
+  } else if (!editing){
+    act.innerHTML =
+      '<span class="chip">已登录：' + esc(currentUser) + '</span>' +
+      '<button class="btn" id="btnEdit">编辑</button>' +
+      '<button class="btn" id="btnLogout">退出登录</button>';
+  } else {
+    act.innerHTML =
+      '<button class="btn" id="btnAdd">＋ 添加链接</button>' +
+      '<button class="btn primary" id="btnSave"' + (saving ? ' disabled' : '') + '>' + (saving ? '保存中…' : '保存') + '</button>' +
+      '<button class="btn" id="btnDone">完成</button>' +
+      '<button class="btn" id="btnLogout">退出登录</button>';
+  }
+
+  const brand = $('#brandTitle');
+  if (editing){
+    brand.innerHTML = '<input id="titleInput" value="' + esc(navData.title) + '" placeholder="标题">';
+  } else {
+    brand.innerHTML = '<h1>' + esc(navData.title) + '</h1>';
+  }
+
+  const grid = $('#grid');
+  grid.innerHTML = editing
+    ? navData.links.map(cardEditHTML).join('')
+    : navData.links.map(cardViewHTML).join('');
+  $('#empty').hidden = navData.links.length > 0;
+
+  $('#footHint').textContent = currentUser
+    ? ('已登录 ' + currentUser + (editing ? ' · 编辑中' : ' · 可编辑'))
+    : '未登录 · 只读浏览';
+}
+
+function syncFromDOM(){
+  if (!editing) return;
+  const t = $('#titleInput');
+  if (t) navData.title = t.value.trim() || '导航';
+  const links = [];
+  document.querySelectorAll('#grid .card.edit').forEach(c => {
+    const old = navData.links[Number(c.dataset.idx)] || {};
+    links.push({
+      name: $('.in-name', c).value.trim(),
+      url: $('.in-url', c).value.trim(),
+      desc: $('.in-desc', c).value.trim(),
+      lock: !!old.lock
+    });
+  });
+  navData.links = links;
+}
+function focusLast(){
+  const cards = document.querySelectorAll('#grid .card.edit');
+  const last = cards[cards.length - 1];
+  if (last){
+    syncFromDOM();
+    const inp = $('.in-name', last);
+    if (inp) inp.focus();
+  }
+}
+function move(idx, d){
+  syncFromDOM();
+  const j = idx + d;
+  if (j < 0 || j >= navData.links.length) return;
+  const tmp = navData.links[idx];
+  navData.links[idx] = navData.links[j];
+  navData.links[j] = tmp;
+  render();
+}
+function removeAt(idx){
+  syncFromDOM();
+  navData.links.splice(idx, 1);
+  render();
+}
+function toggleLock(idx){
+  syncFromDOM();
+  navData.links[idx].lock = !navData.links[idx].lock;
+  render();
+}
+
+/* ---------------- 保存到 GitHub ---------------- */
+async function save(){
+  if (!currentToken) { toast('请先登录', 'err'); return; }
+  syncFromDOM();
+
+  const clean = { title: navData.title || '导航', links: [] };
+  for (const l of navData.links){
+    if (!l.name && !l.url) continue;
+    if (!l.url) {
+      toast('「' + l.name + '」还缺少网址', 'err', 5000);
+      return;
+    }
+    const url = normalizeUrl(l.url);
+    clean.links.push({ name: l.name || hostOf(url) || url, url: url, desc: l.desc, lock: !!l.lock });
+  }
+
+  saving = true; render();
+  try {
+    const api = '/repos/' + CONFIG.owner + '/' + CONFIG.repo + '/contents/' + CONFIG.dataPath;
+    let sha = null;
+    const cur = await gh(api + '?ref=' + encodeURIComponent(CONFIG.branch));
+    if (cur.ok) sha = cur.data && cur.data.sha;
+    else if (cur.status !== 404) throw new Error('读取数据文件失败（HTTP ' + cur.status + '）');
+
+    const body = {
+      message: '更新导航链接（网页编辑）',
+      content: b64encodeUtf8(JSON.stringify(clean, null, 2)),
+      branch: CONFIG.branch
+    };
+    if (sha) body.sha = sha;
+
+    const put = await gh(api, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!put.ok) throw new Error((put.data && put.data.message) || ('HTTP ' + put.status));
+
+    navData = clean;
+    cacheSet(navData);
+    toast('已保存，约 1 分钟后所有访客都能看到');
+  } catch (err){
+    toast('保存失败：' + err.message, 'err', 6000);
+  } finally {
+    saving = false; render();
+  }
+}
+
+/* ---------------- 登录弹窗 ---------------- */
+function openLogin(){
+  $('#modal').hidden = false;
+  $('#loginErr').hidden = true;
+  $('#tokenInput').value = '';
+  setTimeout(() => $('#tokenInput').focus(), 30);
+}
+function closeLogin(){ $('#modal').hidden = true; }
+async function submitLogin(){
+  const tk = $('#tokenInput').value.trim();
+  const remember = $('#rememberChk').checked;
+  const btn = $('#doLogin');
+  btn.disabled = true; btn.textContent = '验证中…';
+  const r = await doLogin(tk, remember);
+  btn.disabled = false; btn.textContent = '登录';
+  if (!r.ok){
+    const el = $('#loginErr');
+    el.textContent = r.error; el.hidden = false;
+    return;
+  }
+  closeLogin();
+}
+
+/* ---------------- 事件 ---------------- */
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('button');
+  if (!btn) return;
+  if (btn.id === 'btnTheme')  { setTheme(currentTheme() === 'dark' ? 'light' : 'dark'); return; }
+  if (btn.id === 'btnLogin')  { openLogin(); return; }
+  if (btn.id === 'btnEdit')   { editing = true; render(); return; }
+  if (btn.id === 'btnAdd')    { syncFromDOM(); navData.links.push({ name: '', url: '', desc: '' }); render(); focusLast(); return; }
+  if (btn.id === 'btnSave')   { save(); return; }
+  if (btn.id === 'btnDone')   { syncFromDOM(); editing = false; render(); return; }
+  if (btn.id === 'btnLogout') { logout(); return; }
+  if (btn.id === 'cancelLogin'){ closeLogin(); return; }
+  if (btn.id === 'doLogin')   { submitLogin(); return; }
+});
+
+$('#grid').addEventListener('click', (e) => {
+  if (!currentUser && e.target.closest('.card.locked')){ openLogin(); return; }
+  const btn = e.target.closest('button[data-act]');
+  if (!btn || !editing) return;
+  const card = btn.closest('.card');
+  const idx = Number(card && card.dataset.idx);
+  if (isNaN(idx)) return;
+  if (btn.dataset.act === 'up') move(idx, -1);
+  else if (btn.dataset.act === 'down') move(idx, 1);
+  else if (btn.dataset.act === 'del') removeAt(idx);
+  else if (btn.dataset.act === 'lock') toggleLock(idx);
+});
+
+$('#modal').addEventListener('click', (e) => { if (e.target === $('#modal')) closeLogin(); });
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !$('#modal').hidden) closeLogin();
+  if (e.key === 'Enter' && e.target && e.target.id === 'tokenInput') submitLogin();
+});
+
+/* ---------------- 启动 ---------------- */
+async function init(){
+  updateThemeBtn();
+  const published = await loadPublished();
+  navData = normalizeData(published) || normalizeData(cacheGet()) || normalizeData(DEFAULT_NAV)
+         || { title: '导航', links: [] };
+  cacheSet(navData);
+  render();
+  await restoreSession();
+}
+init();
+</script>
+</body>
+</html>
