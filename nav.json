@@ -2,27 +2,15 @@
   "title": "导航--防丢失",
   "links": [
     {
-      "name": "林nnnn",
-      "url": "http://106.52.9.23:3000/dashboard/overview",
+      "name": "CPA面板",
+      "url": "http://127.0.0.1:8317/management.html",
       "desc": "",
-      "lock": true
-    },
-    {
-      "name": "防丢失联系",
-      "url": "https://qm.qq.com/q/dM6AZSMHzW",
-      "desc": "加群链接",
       "lock": false
     },
     {
-      "name": "免费公益站--统计合集",
-      "url": "https://vcnzf1j2lbd8.feishu.cn/wiki/Mi8AwMt9FiSDFjkD4vjcYlkqnpR",
-      "desc": "基本上都是签到领额度，也有一些免费的",
-      "lock": false
-    },
-    {
-      "name": "免费鸡蛋--统计合集",
-      "url": "https://vcnzf1j2lbd8.feishu.cn/wiki/EpK6w3brmiWnc4k8TI2c9UAfntc",
-      "desc": "一次性的鸡蛋",
+      "name": "web Deepseek",
+      "url": "http://127.0.0.1:8030/admin",
+      "desc": "",
       "lock": false
     }
   ]
