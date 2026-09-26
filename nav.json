@@ -2,6 +2,12 @@
   "title": "导航--防丢失",
   "links": [
     {
+      "name": "林nnnn",
+      "url": "http://106.52.9.23:3000/channels",
+      "desc": "",
+      "lock": false
+    },
+    {
       "name": "CPA面板",
       "url": "http://127.0.0.1:8317/management.html",
       "desc": "",
