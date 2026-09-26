@@ -18,6 +18,12 @@
       "url": "http://127.0.0.1:8030/admin",
       "desc": "",
       "lock": false
+    },
+    {
+      "name": "NapCat",
+      "url": "http://127.0.0.1:6099/webui?token=d1651e308d2c",
+      "desc": "",
+      "lock": false
     }
   ]
 }
