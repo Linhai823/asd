@@ -30,6 +30,12 @@
       "url": "http://127.0.0.1:6185/#/session-management",
       "desc": "",
       "lock": false
+    },
+    {
+      "name": "华为CPA",
+      "url": "http://120.46.203.183:8317/management.html#/config",
+      "desc": "",
+      "lock": false
     }
   ]
 }
