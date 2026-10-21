@@ -36,6 +36,12 @@
       "url": "https://8317-agqt2wpb2mxm7m3swfxycaozgi.instabox.tech/management.html#/",
       "desc": "",
       "lock": false
+    },
+    {
+      "name": "海外",
+      "url": "https://3000-agqt2wpb2mxm7m3swfxycaozgi.instabox.tech/usage-logs/common",
+      "desc": "",
+      "lock": false
     }
   ]
 }
