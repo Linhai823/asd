@@ -42,6 +42,12 @@
       "url": "https://3000-agqt2wpb2mxm7m3swfxycaozgi.instabox.tech/usage-logs/common",
       "desc": "",
       "lock": false
+    },
+    {
+      "name": "omnirush2api--panel",
+      "url": "http://106.52.9.23:20129/panel",
+      "desc": "",
+      "lock": false
     }
   ]
 }
