@@ -14,24 +14,6 @@
       "lock": false
     },
     {
-      "name": "web Deepseek",
-      "url": "http://127.0.0.1:8030/admin",
-      "desc": "",
-      "lock": false
-    },
-    {
-      "name": "NapCat",
-      "url": "http://127.0.0.1:6099/webui?token=d1651e308d2c",
-      "desc": "",
-      "lock": false
-    },
-    {
-      "name": "AstrBot",
-      "url": "http://127.0.0.1:6185/#/session-management",
-      "desc": "",
-      "lock": false
-    },
-    {
       "name": "huawei--CPA",
       "url": "http://120.46.203.183:8317/management.html",
       "desc": "",
@@ -40,12 +22,6 @@
     {
       "name": "腾讯云抢购",
       "url": "https://106.52.9.23:8790/",
-      "desc": "",
-      "lock": false
-    },
-    {
-      "name": "omnirush2api--panel",
-      "url": "http://106.52.9.23:20129/panel",
       "desc": "",
       "lock": false
     }
