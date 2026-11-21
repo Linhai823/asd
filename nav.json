@@ -32,14 +32,14 @@
       "lock": false
     },
     {
-      "name": "国外CPA",
+      "name": "huawei--CPA",
       "url": "http://120.46.203.183:8317/management.html",
       "desc": "",
       "lock": false
     },
     {
-      "name": "海外",
-      "url": "https://3000-agqt2wpb2mxm7m3swfxycaozgi.instabox.tech/usage-logs/common",
+      "name": "腾讯云抢购",
+      "url": "https://106.52.9.23:8790/",
       "desc": "",
       "lock": false
     },
