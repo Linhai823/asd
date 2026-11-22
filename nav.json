@@ -24,6 +24,18 @@
       "url": "https://106.52.9.23:8790/",
       "desc": "",
       "lock": false
+    },
+    {
+      "name": "doubaowork",
+      "url": "http://106.52.9.23:20129",
+      "desc": "",
+      "lock": false
+    },
+    {
+      "name": "novnc",
+      "url": "http://106.52.9.23:10086/vnc.html?autoconnect=1&resize=scale",
+      "desc": "",
+      "lock": false
     }
   ]
 }
