@@ -4,7 +4,7 @@
     {
       "name": "林nnnn",
       "url": "http://106.52.9.23:3000/channels",
-      "desc": "https://api.liuschz.site",
+      "desc": "",
       "lock": false
     },
     {
@@ -40,6 +40,12 @@
     {
       "name": "nginx",
       "url": "https://panel.liuschz.site/",
+      "desc": "",
+      "lock": false
+    },
+    {
+      "name": "林liuschz",
+      "url": "https://api.liuschz.site",
       "desc": "",
       "lock": false
     }
