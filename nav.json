@@ -48,6 +48,12 @@
       "url": "https://api.liuschz.site",
       "desc": "",
       "lock": false
+    },
+    {
+      "name": "codearts",
+      "url": "https://codearts.liuschz.site/",
+      "desc": "",
+      "lock": false
     }
   ]
 }
