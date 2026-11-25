@@ -20,12 +20,6 @@
       "lock": false
     },
     {
-      "name": "腾讯云抢购",
-      "url": "https://106.52.9.23:8790/",
-      "desc": "",
-      "lock": false
-    },
-    {
       "name": "doubaowork",
       "url": "http://106.52.9.23:20129",
       "desc": "",
