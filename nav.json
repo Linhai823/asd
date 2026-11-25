@@ -26,12 +26,6 @@
       "lock": false
     },
     {
-      "name": "novnc",
-      "url": "http://106.52.9.23:10086/vnc.html?autoconnect=1&resize=scale",
-      "desc": "",
-      "lock": false
-    },
-    {
       "name": "nginx",
       "url": "https://panel.liuschz.site/",
       "desc": "",
