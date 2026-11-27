@@ -42,6 +42,12 @@
       "url": "https://codearts.liuschz.site/",
       "desc": "",
       "lock": false
+    },
+    {
+      "name": "codearts2api",
+      "url": "http://81.70.53.78:8080/admin",
+      "desc": "",
+      "lock": false
     }
   ]
 }
