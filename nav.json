@@ -48,6 +48,12 @@
       "url": "http://81.70.53.78:8080/admin",
       "desc": "",
       "lock": false
+    },
+    {
+      "name": "华为new",
+      "url": "http://120.46.203.183/",
+      "desc": "",
+      "lock": false
     }
   ]
 }
